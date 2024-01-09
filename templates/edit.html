@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}
+Edit User
+{% endblock %}
+
+
+
+
+
+{% block header %}
+  Edit a User
+{% endblock %}
+
+
+
+
+{% block content %}
+<form method="POST" action="/users/{{user.id}}/update">
+  <p>First Name:     <br><input name="first" type="text" minlength="2" value="{{user.first}}" required></p>
+  <p>Last Name:  <br><input name="last" type="text" minlength="2" value="{{user.last}}" required></p>
+  <p>Profile Pic:   <br><input name="image" type="url" value="{{user.image}}"></p>
+  <button class="btn btn-outline-info"><a href="/users/{{user.id}}">Cancel</a></button>
+  <button type="submit" class="btn btn-success">Save</button>
+</form>
+{% endblock %}

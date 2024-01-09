@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{user.first}}'s Profile
+{% endblock %}
+
+
+
+
+
+{% block header %}
+  
+{% endblock %}
+
+
+
+
+{% block content %}
+<div idclass="container" id="main">
+  <div class="row">
+    <div class="col">
+      <img src="{{user.image}}" alt="">
+    </div>
+    <div class="col">
+      <div class="container">
+        <div class="row">
+          <h1>{{user.first}} {{user.last}}</h1>
+        </div>
+        <div class="row">
+          <div class="col">
+            <form action="/users/{{user.id}}/edit">
+                <button class="btn btn-primary">Edit</button>   
+            </form>
+          </div>
+          <div class="col">
+              <form method="POST" action="/users/{{user.id}}/delete">
+                  <button class="btn btn-danger">Delete</button>
+            </form>
+            </div>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+<a href="/">Return to Users</a>
+
+{% endblock %}

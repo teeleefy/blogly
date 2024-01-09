@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}
+Create User
+{% endblock %}
+
+
+
+
+
+{% block header %}
+  Create a User
+{% endblock %}
+
+
+
+
+{% block content %}
+<form method="POST" action="/save">
+  <p>First Name: <br><input name="first" type="text" minlength="2" placeholder="Enter a first name"></p>
+  <p>Last Name: <br><input name="last" type="text" minlength="2" placeholder="Enter a last name"></p>
+  <p>Profile Pic: <br><input name="image" type="url" placeholder="Provide an image of user"></p>
+  <button class="btn btn-success">Add</button>
+</form>
+
+<a href="/">Return to Users</a>
+{% endblock %}
