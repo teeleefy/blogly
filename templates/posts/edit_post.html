@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}
+Edit Post
+{% endblock %}
+
+
+
+
+
+{% block header %}
+  Edit Post
+{% endblock %}
+
+
+
+
+{% block content %}
+<form method="POST" action="/users/{{user.id}}/posts/{{post.id}}/update">
+  <p>Title:     <br><input name="title" type="text" minlength="2" value="{{post.title}}" required></p>
+  <p>Post Content:  <br><input name="content" type="text" minlength="2" value="{{post.content}}" required></p>
+  <button class="btn btn-outline-info"><a href="/users/{{user.id}}/posts/{{post.id}}">Cancel</a></button>
+  <button type="submit" class="btn btn-success">Save</button>
+</form>
+{% endblock %}

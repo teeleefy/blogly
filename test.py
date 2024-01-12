@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from app import app
-from models import db, User
+from models import db, User, Post
 
 # Use test database and don't clutter tests with SQL
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///blogly_test'
@@ -19,23 +19,19 @@ with app.app_context():
 
 
 class UsersTestCase(TestCase):
-    """Tests for views for Pets."""
+    """Tests for views for Users."""
 
     def setUp(self):
         """Add sample user."""
         with app.app_context():
             User.query.delete()
-
+            Post.query.delete()
             user = User(first="Flower", last="Power", image="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6njAYMm91UmTViYt7rf7U9BpKxYN2wV0FSHQkyQOHx1hoj_KXr7a5roTNDdYiQGJDcuI&usqp=CAU")
             db.session.add(user)
             db.session.commit()
-
+            
             self.user_id = user.id
 
-    def tearDown(self):
-        """Clean up any fouled transaction."""
-        with app.app_context():
-            db.session.rollback()
 
     def test_list_user(self):
         with app.test_client() as client:
@@ -52,6 +48,7 @@ class UsersTestCase(TestCase):
 
             self.assertEqual(resp.status_code, 200)
             self.assertIn('<h1>Flower Power</h1>', html)
+    
 
     def test_add_user(self):
         
@@ -69,5 +66,22 @@ class UsersTestCase(TestCase):
             html = resp.get_data(as_text=True)
             self.assertEqual(resp.status_code, 200)
             self.assertNotIn("<h1>Flower Power</h1>", html)
-            
+
+    def test_add_post(self):
+         with app.test_client() as client:
+                with app.app_context():
+                    d = {"title": "Hi There Hello", "content": "This is my first post, and I just wanted to say hi to everybody.", "user_id" : self.user_id}
+                    resp = client.post(f"/users/{self.user_id}/save_post", data=d, follow_redirects=True)
+                    html = resp.get_data(as_text=True)
+                    self.assertEqual(resp.status_code, 200)
+                    self.assertIn("Hi There Hello", html)
+
+    def tearDown(self):
+        """Clean up any fouled transaction."""
+        with app.app_context():
+            db.session.rollback()
+    
+# post = Post(title='', content='This is my first post, and I just wanted to say hi to everybody.', )
+                    
+                 
             

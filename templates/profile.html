@@ -38,10 +38,31 @@
             </form>
             </div>
           </div>
+          <div id="posts" class="row">
+            <div class="container">
+              <div class="row">
+                
+                <figure>
+                  <figcaption class="h3">Posts</figcaption>
+                  <ul>
+                      {% for post in posts %}
+                      <li><a href="/users/{{user.id}}/posts/{{post.id}}">{{ post.title }}</a></li>
+                      {% endfor %} 
+                  </ul>
+                </figure>
+                
+                
+                  <button type="button" class="btn btn-primary button"><a class="add" href="/users/{{user.id}}/add_post">Add Post</a></button>
+                  
+                  
+               </div>   
+          </div>
       </div>
     </div>
   </div>
 </div>
+
+
 <a href="/">Return to Users</a>
 
 {% endblock %}

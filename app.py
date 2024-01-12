@@ -4,7 +4,7 @@ from flask import Flask, request, redirect, render_template
 from flask_debugtoolbar import DebugToolbarExtension
 
 # sql imports
-from models import db, connect_db, User
+from models import db, connect_db, User, Post
 
 # app configuration
 app = Flask(__name__)
@@ -69,7 +69,8 @@ def show_user(user_id):
     """Show info on a single user."""
 
     user = User.query.get_or_404(user_id)
-    return render_template("profile.html", user=user)
+    posts = Post.query.filter_by(user_id = user_id).all()
+    return render_template("profile.html", user=user, posts = posts)
 
 # **GET */users/[user-id]/edit :*** Show the edit page for a user. Have a cancel button that returns to the detail page for a user, and a save button that updates the user.
 
@@ -106,3 +107,96 @@ def delete_user(user_id):
     db.session.delete(user)
     db.session.commit()
     return redirect("/")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#-------------------POSTS SECTION----------------------------------------------------------
+#Make a route for adding posts. It will be a direct render_template
+@app.route("/users/<int:user_id>/add_post")
+def add_post(user_id):
+    """Direct user to add post page."""
+    user = User.query.get_or_404(user_id)
+    return render_template("/posts/add_post.html", user=user)
+
+#Make a route for saving posts.  It will handle the form data, and update database. Then it will redirect you to your post url.
+@app.route("/users/<int:users_id>/save_post", methods=["POST"])
+def save_post(users_id):
+    """Add post and redirect to post's page."""
+    user = User.query.get_or_404(users_id)
+    title = request.form['title']
+    content = request.form['content']
+    post = Post(title=title, content=content, user_id = users_id)
+    db.session.add(post)
+    db.session.commit()
+
+    return redirect(f"/users/{user.id}/posts/{post.id}")
+
+# #This will be your post page.  It will also have links that lead to the edit pages and the delete option.
+# /users/{user.id}/posts/{post.id}
+@app.route("/users/<int:user_id>/posts/<int:post_id>")
+def see_post(user_id, post_id):
+    """Direct user to add post page."""
+    user = User.query.get_or_404(user_id)
+    post = Post.query.filter_by(id = post_id).one()
+    return render_template("/posts/post.html", user=user, post=post)
+
+
+# #This is a link to the edit page.  It will render template of the edit_post.html
+# /users/{{user.id}}/posts/{{post.id}}/edit
+@app.route("/users/<int:user_id>/posts/<int:post_id>/edit")
+def edit_post(user_id, post_id):
+    """Edit info on a single user."""
+    user = User.query.get_or_404(user_id)
+    post = Post.query.filter_by(id = post_id).one()
+    return render_template("/posts/edit_post.html", user=user, post=post)
+
+
+#This is a redirect link.  It will handle the form data and update the post in the database. It will then redirect you to the newly updated post's page.
+@app.route("/users/<int:user_id>/posts/<int:post_id>/update", methods=["POST"])
+def update_post(user_id, post_id):
+    """Update post when edited."""
+    user = User.query.get_or_404(user_id)
+    post = Post.query.filter_by(id = post_id).one()
+    title = request.form['title']
+    content = request.form['content']
+    post.title = title
+    post.content = content
+    db.session.add(post)
+    db.session.commit()
+    return redirect(f"/users/{user.id}/posts/{post.id}")
+
+
+# #This is a redirect link.  It will remove the post from the database.  Then it will redirect you to the user's profile page. 
+# /users/{{user.id}}/posts/{{post.id}}/delete
+@app.route("/users/<int:user_id>/posts/<int:post_id>/delete", methods=["POST"])
+def delete_post(user_id, post_id):
+    """Delete post and redirect to updated User profile page."""
+    user = User.query.get_or_404(user_id)
+    post = Post.query.filter_by(id = post_id).one()
+    db.session.delete(post)
+    db.session.commit()
+    return redirect(f"/users/{user.id}")
+

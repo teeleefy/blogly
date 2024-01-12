@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}
+Add Post
+{% endblock %}
+
+
+
+
+
+{% block header %}
+  Add Post for {{user.first}} {{user.last}}
+{% endblock %}
+
+
+
+
+{% block content %}
+<form method="POST" action="/users/{{user.id}}/save_post">
+  <p>Title: <br><input name="title" type="text" minlength="2" maxlength="50" ></p>
+  <p>Content: <br><input id="text_box" name="content" type="text" minlength="2" ></p>
+  <button class="btn btn-outline-info"><a href="/users/{{user.id}}">Cancel</a></button>
+  <button type="submit" class="btn btn-success">Add</button>
+</form>
+{% endblock %}

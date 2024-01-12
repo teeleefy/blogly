@@ -1,10 +1,11 @@
-#add {
+.add {
     color: white;
     
 }
 
 a {
     text-decoration: none;
+   
 }
 
 body {
@@ -13,4 +14,23 @@ body {
 
 #main {
     width: 50%;
+}
+
+.button {
+    width: fit-content;
+
+}
+
+#posts {
+    margin-top: 1rem;
+}
+
+#buttons {
+    width: 25%;
+    margin-right: 0 auto;
+}
+
+#text_box {
+    width: 50%;
+    
 }

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+
+
+{% block title %}
+Blogly Post
+{% endblock %}
+
+
+
+
+
+{% block header %}
+  {{post.title}}
+{% endblock %}
+
+
+
+
+{% block content %}
+
+
+<p>{{post.content}}</p><br>
+<p><i>By {{user.first}} {{user.last}}</i></p>
+<p><i>Created at {{post.created_at}}</i></p>
+<button class="btn btn-outline-info"><a href="/users/{{user.id}}">Cancel</a></button>
+<form action="/users/{{user.id}}/posts/{{post.id}}/edit">
+      <button class="btn btn-primary">Edit</button>   
+</form>
+<form method="POST" action="/users/{{user.id}}/posts/{{post.id}}/delete">
+        <button class="btn btn-danger">Delete</button>
+    </form>
+  {% endblock %}
