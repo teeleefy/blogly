@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}
+Edit Tag
+{% endblock %}
+
+
+
+
+
+{% block header %}
+  Edit Tag
+{% endblock %}
+
+
+
+
+{% block content %}
+<form method="POST" action="/tags/{{tag.id}}/edit">
+  <p>Name:     <br><input name="name" type="text" minlength="2" value="{{tag.name}}" required></p>
+  
+  <button class="btn btn-outline-info"><a href="/tags/{{tag.id}}">Cancel</a></button>
+  <button type="submit" class="btn btn-success">Save</button>
+</form>
+{% endblock %}

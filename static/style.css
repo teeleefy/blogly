@@ -34,3 +34,14 @@ body {
     width: 50%;
     
 }
+
+img {
+    width: 15rem;
+}
+
+.post_tag {
+    height: fit-content;
+    padding: 1px;
+    font-size: small;
+    font-weight:bold;
+}

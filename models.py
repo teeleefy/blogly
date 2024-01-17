@@ -44,15 +44,48 @@ class Post(db.Model):
     user_id = db.Column(db.Integer,
                           db.ForeignKey("users.id"),
                           nullable=False)
-    
-
-
+    tags = db.relationship('Tag',
+                               secondary='post_tags',
+                               backref='posts')
     def __repr__(self):
         """Show info about user."""
 
         p = self
-        return f"<Post ID: {p.id}. Posted by:{p.posted_by}. Title: {p.title} >"
+        return f"<Post ID: {p.id}. Posted by:{p.user_id}. Title: {p.title}.>"
     
+class PostTag(db.Model):
+    """Post Tags Join Table."""
+
+    __tablename__ = "post_tags"
+    post_id = db.Column(db.Integer, 
+                          db.ForeignKey("posts.id"), primary_key=True,
+                          nullable=False)
+    tag_id = db.Column(db.Integer, 
+                          db.ForeignKey("tags.id"), primary_key=True,
+                          nullable=False)
+    
+    def __repr__(self):
+        """Show info about post_tag."""
+        p = self
+        return f"<Post ID: {p.post_id}. Tag ID:{p.tag_id}.>"
+    
+class Tag(db.Model):
+    """Tag."""
+
+    __tablename__ = "tags"
+
+    id = db.Column(db.Integer,
+                   primary_key=True,
+                   autoincrement=True)
+    name = db.Column(db.String(50),
+                     nullable=False, unique=True)
+    
+    def __repr__(self):
+        """Show info about user."""
+
+        p = self
+        return f"<Tag ID: {p.id}. Tag name:{p.name}. >"
+
 
 def connect_db(app):
     """Connect to database."""

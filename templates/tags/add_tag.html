@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}
+Add Tag
+{% endblock %}
+
+
+
+
+
+{% block header %}
+  Create a Tag
+{% endblock %}
+
+
+
+
+{% block content %}
+<form method="POST" action="/tags/new">
+  <p>Tag Name: <br><input name="name" type="text" minlength="2" maxlength="50" placeholder="Enter a name for the tag"></p>
+  <button class="btn btn-outline-info"><a href="/users">Cancel</a></button>
+  <button type="submit" class="btn btn-success">Add</button>
+</form>
+{% endblock %}

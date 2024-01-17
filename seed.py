@@ -1,6 +1,6 @@
 """Seed file to make sample data for pets db."""
 
-from models import User, db
+from models import User, db, Post, PostTag, Tag
 from app import app
 
 # Create all tables

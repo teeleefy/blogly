@@ -4,7 +4,7 @@ from flask import Flask, request, redirect, render_template
 from flask_debugtoolbar import DebugToolbarExtension
 
 # sql imports
-from models import db, connect_db, User, Post
+from models import db, connect_db, User, Post, PostTag, Tag
 
 # app configuration
 app = Flask(__name__)
@@ -21,8 +21,11 @@ app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
 # connect to database
 connect_db(app)
-# db.create_all()
 
+# Use the three lines below to drop the tables in the database and recreate them
+# with app.app_context():
+#     db.drop_all()
+#     db.create_all()
 #--------------------------------------------------------------------------------------
 # **Make routes for the following:**
 
@@ -131,15 +134,14 @@ def delete_user(user_id):
 
 
 
-
-
 #-------------------POSTS SECTION----------------------------------------------------------
 #Make a route for adding posts. It will be a direct render_template
 @app.route("/users/<int:user_id>/add_post")
 def add_post(user_id):
     """Direct user to add post page."""
     user = User.query.get_or_404(user_id)
-    return render_template("/posts/add_post.html", user=user)
+    tags = Tag.query.all()
+    return render_template("/posts/add_post.html", user=user, tags = tags)
 
 #Make a route for saving posts.  It will handle the form data, and update database. Then it will redirect you to your post url.
 @app.route("/users/<int:users_id>/save_post", methods=["POST"])
@@ -148,10 +150,12 @@ def save_post(users_id):
     user = User.query.get_or_404(users_id)
     title = request.form['title']
     content = request.form['content']
-    post = Post(title=title, content=content, user_id = users_id)
-    db.session.add(post)
+    post_tags = [int(num) for num in request.form.getlist('tag')]
+    tags = Tag.query.filter(Tag.id.in_(post_tags)).all()
+    post = Post(title=title, content=content, user_id = users_id, tags = tags)
+    db.session.add(post)   
     db.session.commit()
-
+    # return render_template('/tags/experiment.html', tags = post_tags)
     return redirect(f"/users/{user.id}/posts/{post.id}")
 
 # #This will be your post page.  It will also have links that lead to the edit pages and the delete option.
@@ -161,6 +165,7 @@ def see_post(user_id, post_id):
     """Direct user to add post page."""
     user = User.query.get_or_404(user_id)
     post = Post.query.filter_by(id = post_id).one()
+    
     return render_template("/posts/post.html", user=user, post=post)
 
 
@@ -171,7 +176,8 @@ def edit_post(user_id, post_id):
     """Edit info on a single user."""
     user = User.query.get_or_404(user_id)
     post = Post.query.filter_by(id = post_id).one()
-    return render_template("/posts/edit_post.html", user=user, post=post)
+    tags = Tag.query.all()
+    return render_template("/posts/edit_post.html", user=user, post=post, tags=tags)
 
 
 #This is a redirect link.  It will handle the form data and update the post in the database. It will then redirect you to the newly updated post's page.
@@ -180,10 +186,15 @@ def update_post(user_id, post_id):
     """Update post when edited."""
     user = User.query.get_or_404(user_id)
     post = Post.query.filter_by(id = post_id).one()
+    #get form content
     title = request.form['title']
     content = request.form['content']
+    post_tags = [int(num) for num in request.form.getlist('tag')]
+    tags = Tag.query.filter(Tag.id.in_(post_tags)).all()
+    #update post in database
     post.title = title
     post.content = content
+    post.tags = tags
     db.session.add(post)
     db.session.commit()
     return redirect(f"/users/{user.id}/posts/{post.id}")
@@ -199,4 +210,70 @@ def delete_post(user_id, post_id):
     db.session.delete(post)
     db.session.commit()
     return redirect(f"/users/{user.id}")
+
+
+
+
+#---------------------------------Many-to-Many-----------------------------------
+
+### ****Add Routes****
+
+
+# **GET */tags :*** Lists all tags, with links to the tag detail page.
+@app.route("/tags")
+def list_tags():
+    """List tags."""
+    tags = Tag.query.order_by(Tag.name).all()
+    return render_template("/tags/list_tags.html", tags=tags)
+
+
+# **GET */tags/[tag-id] :*** Show detail about a tag. Have links to edit form and to delete.
+@app.route("/tags/<int:tag_id>")
+def see_tag(tag_id):
+    """Direct user to a tag's page."""
+    tag = Tag.query.get_or_404(tag_id)
+    return render_template("/tags/show_tag.html", tag=tag)
+
+# **GET */tags/new :*** Shows a form to add a new tag.
+# **POST */tags/new :*** Process add form, adds tag, and redirect to tag list.
+@app.route('/tags/new', methods=['GET', 'POST'])
+def add_tag():
+    if request.method == 'POST':
+        tag_name = request.form['name']
+        tag = Tag(name = tag_name)
+        db.session.add(tag)
+        db.session.commit()
+        return redirect("/tags")
+    else:
+        return render_template("/tags/add_tag.html")
+
+
+
+
+
+
+# **GET */tags/[tag-id]/edit :*** Show edit form for a tag.
+# **POST */tags/[tag-id]/edit :*** Process edit form, edit tag, and redirects to the tags list.
+@app.route("/tags/<int:tag_id>/edit", methods=['GET', 'POST'])
+def edit_tag(tag_id):
+    """Edit info on a single tag."""
+    tag = Tag.query.get_or_404(tag_id)
+    if request.method == 'POST':
+        tag_name = request.form['name']
+        tag.name = tag_name
+        db.session.add(tag)
+        db.session.commit()
+        return redirect(f"/tags/{tag_id}")
+    else:
+        return render_template("/tags/edit_tag.html", tag=tag)
+
+
+# **POST */tags/[tag-id]/delete :*** Delete a tag.
+@app.route("/tags/<int:tag_id>/delete", methods=["POST"])
+def delete_tag(tag_id):
+    """Delete tag and redirect to updated list of tags."""
+    tag = Tag.query.get_or_404(tag_id)
+    db.session.delete(tag)
+    db.session.commit()
+    return redirect("/tags")
 
